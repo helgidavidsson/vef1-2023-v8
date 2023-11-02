@@ -1,4 +1,12 @@
 import { createCartLine, showCartContent } from './lib/ui.js';
+import { formatNumber as formatPrice } from './lib/helpers.js';
+/**
+ * @typedef {Object} Product
+ * @property {number} id Auðkenni vöru, jákvæð heiltala stærri en 0.
+ * @property {string} title Titill vöru, ekki tómur strengur.
+ * @property {string} description Lýsing á vöru, ekki tómur strengur.
+ * @property {number} price Verð á vöru, jákvæð heiltala stærri en 0.
+ */
 
 const products = [
   {
@@ -21,25 +29,33 @@ const products = [
     price: 20_000,
   },
 ];
+//reikna samtals kostnað
+function calculateAndUpdateSubtotal() {
+  
+ 
+}
 
 /** Bæta vöru í körfu */
 function addProductToCart(product, quantity) {
   // Hér þarf að finna `<tbody>` í töflu og setja `cartLine` inn í það
-  const cart = document.querySelector('.cart-content');
+  const cartTableBodyElement = document.querySelector('.cart table tbody');
 
-  if (!cart) {
-    console.warn('fann ekki .cart');
-    return;
-  }
+  if (!cartTableBodyElement) {
+    console.warn('fann ekki .cart table')
+   }
+  
   
   // TODO hér þarf að athuga hvort lína fyrir vöruna sé þegar til
   const cartLine = createCartLine(product, quantity);
-  cart.appendChild(cartLine);
+  cartTableBodyElement.appendChild(cartLine);
+  
+   
 
   // Sýna efni körfu
   showCartContent(true);
 
   // TODO sýna/uppfæra samtölu körfu
+  calculateAndUpdateSubtotal()
 }
 
 function submitHandler(event) {
@@ -57,7 +73,14 @@ function submitHandler(event) {
 
   // TODO hér þarf að finna fjölda sem á að bæta við körfu með því að athuga
   // á input
-  const quantity = 1;
+  
+
+
+  const quantityInput = parent.querySelector('input[name="quantity"]');
+  const quantity = quantityInput ? Number.parseInt(quantityInput.value) : 1;
+
+  console.log(quantityInput)
+  console.log(quantity)
 
   // Bætum vöru í körfu (hér væri gott að bæta við athugun á því að varan sé til)
   addProductToCart(product, quantity);
@@ -73,3 +96,34 @@ for (const form of Array.from(addToCartForms)) {
 }
 
 // TODO bæta við event handler á form sem submittar pöntun
+function handleCheckout(event) {
+  event.preventDefault();
+
+  const name = document.getElementById('name').value;
+  const address = document.getElementById('address').value;
+
+  if (!name.trim() || !address.trim()) {
+    alert('Please fill in all the fields.');
+    return;
+  }
+
+
+  console.log('Checkout data:', { name, address });
+
+  event.target.reset();
+  alert('Pöntun móttekin!');
+
+  document.getElementById('checkoutForm').style.display = 'none';
+
+  const receiptSection = document.querySelector('.receipt');
+  if (receiptSection) {
+    receiptSection.style.display = 'block'; 
+  }
+
+
+
+
+  event.preventDefault();
+}
+
+document.getElementById('checkoutForm').addEventListener('submit', handleCheckout);
